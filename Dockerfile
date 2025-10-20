@@ -10,28 +10,27 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /workspace
 
-# ---------- INSTALL UV ----------
-RUN pip install -U uv
-
 # ---------- CLONE INDEX-TTS REPOSITORY ----------
 RUN git clone https://github.com/index-tts/index-tts.git && cd index-tts && git lfs pull
 
 WORKDIR /workspace/index-tts
 
+# ---------- COPY REQUIREMENTS ----------
+COPY requirements.txt /workspace/index-tts/requirements.txt
+
 # ---------- INSTALL DEPENDENCIES ----------
-RUN uv sync --all-extras
+RUN pip install --upgrade pip setuptools wheel \
+    && pip install -r requirements.txt
 
 # ---------- INSTALL MODELSCOPE AND DOWNLOAD MODEL ----------
-RUN uv tool install "modelscope"
+RUN pip install "modelscope"
 RUN modelscope download --model IndexTeam/IndexTTS-2 --local_dir checkpoints
 
 # ---------- COPY YOUR HANDLER ----------
-# Copy your RunPod handler (the one you posted earlier)
 COPY handler.py /workspace/index-tts/handler.py
 
 # ---------- SETUP ENVIRONMENT ----------
-ENV PATH="/workspace/index-tts/.venv/bin:$PATH"
 ENV PYTHONPATH="/workspace/index-tts"
 
 # ---------- LAUNCH HANDLER ----------
-CMD ["uv", "run", "python", "handler.py"]
+CMD ["python3", "handler.py"]
