@@ -404,7 +404,7 @@ torch==2.8.0 ; sys_platform != 'linux' and sys_platform != 'win32'
     #   julius
     #   torch-stoi
     #   torchaudio
-torch==2.8.0+cu128 ; sys_platform == 'linux' or sys_platform == 'win32'
+torch==2.8.0+cu121 ; sys_platform == 'linux' or sys_platform == 'win32'
     # via
     #   accelerate
     #   descript-audiotools
