@@ -1,6 +1,5 @@
 # ---------- BASE ----------
-FROM nvidia/cuda:12.1.0-cudnn8-runtime-ubuntu22.04
-
+FROM pytorch/pytorch:2.8.0-cuda12.9-cudnn9-devel
 # ---------- SYSTEM SETUP ----------
 ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
