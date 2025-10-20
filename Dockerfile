@@ -19,8 +19,7 @@ WORKDIR /workspace/index-tts
 COPY requirements.txt /workspace/index-tts/requirements.txt
 
 # ---------- INSTALL DEPENDENCIES ----------
-RUN pip install --upgrade pip setuptools wheel \
-    && pip install -r requirements.txt
+RUN pip install -r requirements.txt
 
 # ---------- INSTALL MODELSCOPE AND DOWNLOAD MODEL ----------
 RUN pip install "modelscope"
