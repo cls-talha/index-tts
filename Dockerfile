@@ -31,4 +31,4 @@ COPY handler.py /workspace/index-tts/handler.py
 ENV PYTHONPATH="/workspace/index-tts"
 
 # ---------- LAUNCH HANDLER ----------
-CMD ["python3", "handler.py"]
+CMD ["python3","-u", "handler.py"]
