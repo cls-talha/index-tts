@@ -1,4 +1,4 @@
-# ---------- BASE ----------
+# ---------- BASE IMAGE ---------- 
 FROM pytorch/pytorch:2.8.0-cuda12.9-cudnn9-devel
 
 # ---------- SYSTEM SETUP ----------
@@ -8,28 +8,25 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git git-lfs curl wget build-essential libssl-dev zlib1g-dev \
     libbz2-dev libreadline-dev libsqlite3-dev libncursesw5-dev \
     xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev \
-    ffmpeg \
-    && git lfs install \
-    && rm -rf /var/lib/apt/lists/*
+    ffmpeg && \
+    git lfs install && \
+    rm -rf /var/lib/apt/lists/*
 
 # ---------- INSTALL PYTHON 3.11 ----------
-RUN wget https://www.python.org/ftp/python/3.11.6/Python-3.11.6.tgz && \
-    tar -xf Python-3.11.6.tgz && \
-    cd Python-3.11.6 && \
-    ./configure --enable-optimizations && \
-    make -j$(nproc) && \
-    make altinstall && \
-    cd .. && rm -rf Python-3.11.6*
-
-# ---------- SET PYTHON 3.11 AS DEFAULT ----------
-RUN update-alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.11 1 && \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3.11 python3.11-venv python3.11-dev python3-pip && \
+    ln -sf /usr/bin/python3.11 /usr/local/bin/python3 && \
+    ln -sf /usr/bin/python3.11 /usr/local/bin/python && \
     python3 --version && \
-    curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
+    curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11 && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /workspace
 
 # ---------- CLONE INDEX-TTS REPOSITORY ----------
-RUN git clone https://github.com/index-tts/index-tts.git && cd index-tts && git lfs pull
+RUN git clone https://github.com/index-tts/index-tts.git && \
+    cd index-tts && \
+    git lfs pull
 
 WORKDIR /workspace/index-tts
 
@@ -37,12 +34,12 @@ WORKDIR /workspace/index-tts
 COPY requirements.txt /workspace/index-tts/requirements.txt
 
 # ---------- INSTALL DEPENDENCIES ----------
-RUN python3 -m pip install --upgrade pip && \
-    python3 -m pip install -r requirements.txt
+RUN python3.11 -m pip install --upgrade pip && \
+    python3.11 -m pip install -r requirements.txt
 
 # ---------- INSTALL MODELSCOPE AND DOWNLOAD MODEL ----------
-RUN python3 -m pip install "modelscope"
-RUN modelscope download --model IndexTeam/IndexTTS-2 --local_dir checkpoints
+RUN python3.11 -m pip install "modelscope" && \
+    modelscope download --model IndexTeam/IndexTTS-2 --local_dir checkpoints
 
 # ---------- COPY YOUR HANDLER ----------
 COPY handler.py /workspace/index-tts/handler.py
@@ -51,4 +48,4 @@ COPY handler.py /workspace/index-tts/handler.py
 ENV PYTHONPATH="/workspace/index-tts"
 
 # ---------- LAUNCH HANDLER ----------
-CMD ["python3", "-u", "handler.py"]
+CMD ["python3.11", "-u", "handler.py"]
